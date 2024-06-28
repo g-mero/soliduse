@@ -1,0 +1,40 @@
+{
+  "name": "solid-uses",
+  "type": "module",
+  "version": "0.0.1",
+  "private": false,
+  "description": "Try make a tiny vueuse port for SolidJS",
+  "license": "MIT",
+  "keywords": [
+    "solid",
+    "solidjs",
+    "vueuse",
+    "utils"
+  ],
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "start": "vite",
+    "dev": "vite",
+    "replace": "node scripts/replacePath.cjs",
+    "build": "vite build && tsc -p ./tsconfig.types.json && node scripts/replacePath.cjs",
+    "serve": "vite preview"
+  },
+  "dependencies": {
+    "solid-js": "^1.8.17"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.21.1",
+    "@types/node": "^20.14.2",
+    "@unocss/reset": "^0.61.0",
+    "@unocss/vite": "^0.61.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-solid": "^0.14.1",
+    "typescript": "^5.4.5",
+    "unocss": "^0.61.0",
+    "unplugin-auto-import": "^0.17.6",
+    "vite": "^5.3.1",
+    "vite-plugin-solid": "^2.10.2"
+  }
+}
