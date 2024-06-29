@@ -6,11 +6,13 @@ import TestUseInterval from './test-useInterval'
 import TestUseTimeoutFn from './test-useTimeoutFn'
 import TestUseEventListener from './test-useEventListener'
 import TestCreateGlobalState from './test-createGlobalState'
+import TestCreateComponentState from './test-createComponentState'
 
 const App: Component = () => {
   return (
     <>
-      <TestCreateGlobalState />
+      <TestCreateComponentState />
+      <TestCreateComponentState />
     </>
 
   )

@@ -1,6 +1,6 @@
 /* eslint-disable no-prototype-builtins */
 /* eslint-disable ts/ban-types */
-import type { EffectOptions } from 'solid-js'
+import { type EffectOptions, createComponent } from 'solid-js'
 import type { SetStoreFunction } from 'solid-js/store'
 
 type Methods<T> = {
@@ -19,7 +19,6 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-// core 创建对象和方法
 export function buildRealState<T extends object, M extends Methods<T> = {}>(state: () => T, Methods?: M): RealState<T, M> {
   const [state2, setState] = createStore(state())
 
@@ -61,12 +60,13 @@ export function buildContext<T extends object, M extends Methods<T> = {}>(
     return useContext(context)
   }
 
+  const value = buildRealState(state, methods)
+
   return {
     useContext: useThisContext,
-    Provider: context.Provider,
-    getValue: () => {
-      return buildRealState(state, methods)
+    Provider(props: any) {
+      return createComponent(context.Provider, { value, get children() { return props.children } })
     },
-    Root: context,
+    value,
   }
 }

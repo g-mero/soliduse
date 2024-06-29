@@ -2,7 +2,8 @@ import { createGlobalState } from '../../src'
 
 const state = createGlobalState(() => ({ count: 0 }), {
   increase() {
-    state[1].setCount(state[0].count + 1)
+    const [state2, actions] = state
+    actions.setState('count', state2.count + 1)
   },
 })
 
