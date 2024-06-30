@@ -12,7 +12,7 @@ import TestOnClickOutside from './test-onClickOutside'
 const App: Component = () => {
   return (
     <>
-      <TestOnClickOutside />
+      <TestCreateComponentState />
     </>
 
   )
