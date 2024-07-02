@@ -13,7 +13,7 @@ import { TestWatch } from './test-watch'
 const App: Component = () => {
   return (
     <>
-      <TestWatch />
+      <TestOnClickOutside />
     </>
 
   )

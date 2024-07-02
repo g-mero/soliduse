@@ -102,5 +102,7 @@ export function onClickOutside<T extends OnClickOutsideOptions>(
 
   const stop = () => cleanup.forEach(fn => fn())
 
+  onCleanup(stop)
+
   return stop
 }
