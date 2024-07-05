@@ -1,7 +1,7 @@
 {
   "name": "solid-uses",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "Try make a tiny vueuse port for SolidJS",
   "license": "MIT",
@@ -31,6 +31,9 @@
     "build": "tsup --dts",
     "serve": "vite preview"
   },
+  "peerDependencies": {
+    "solid-js": ">=1.8.17"
+  },
   "dependencies": {},
   "devDependencies": {
     "@antfu/eslint-config": "^2.21.1",
@@ -39,7 +42,6 @@
     "@unocss/vite": "^0.61.0",
     "eslint": "^8.57.0",
     "eslint-plugin-solid": "^0.14.1",
-    "solid-js": "^1.8.17",
     "tsup": "^8.1.0",
     "tsup-preset-solid": "^2.2.0",
     "typescript": "^5.4.5",

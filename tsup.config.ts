@@ -2,6 +2,7 @@
 import { rm } from 'node:fs'
 import { defineConfig } from 'tsup'
 import * as preset from 'tsup-preset-solid'
+import AutoImport from 'unplugin-auto-import/esbuild'
 
 const preset_options: preset.PresetOptions = {
   // array or single object
@@ -15,6 +16,10 @@ const preset_options: preset.PresetOptions = {
   drop_console: true,
   // Set to `true` to generate a CommonJS build alongside ESM
   cjs: false,
+  esbuild_plugins: [AutoImport({
+    imports: ['solid-js'],
+    dts: './auto-imports.d.ts',
+  })],
 }
 
 export default defineConfig((config) => {
