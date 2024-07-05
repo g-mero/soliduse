@@ -12,9 +12,9 @@ type Setter<T> = {
   [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void;
 }
 
-type RealState<T, M> = [Readonly<T>, Setter<T> & Omit<Omit<M, keyof Setter<T>>, 'setState'> & { setState: SetStoreFunction<T> }]
+export type RealState<T, M> = [Readonly<T>, Setter<T> & Omit<Omit<M, keyof Setter<T>>, 'setState'> & { setState: SetStoreFunction<T> }]
 
-interface RealContextThis<T, M> {
+export interface RealContextThis<T, M> {
   state: RealState<T, M>[0]
   actions: RealState<T, M>[1]
 }

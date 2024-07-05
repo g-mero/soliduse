@@ -1,4 +1,4 @@
-import { useInterval } from '@/useInterval'
+import useInterval from '@/useInterval'
 
 function CorePage() {
   const { resume, pause, isActive, counter } = useInterval(500)
