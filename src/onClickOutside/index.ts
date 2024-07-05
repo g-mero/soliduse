@@ -25,13 +25,12 @@ export type OnClickOutsideHandler<
 
 let _iOSWorkaround = false
 
-
 export function onClickOutside<T extends OnClickOutsideOptions>(
-  target: Array<Element> | Element,
+  target: Element,
   handler: OnClickOutsideHandler<{ detectIframe: T['detectIframe'] }>,
   options: T = {} as T,
 ) {
-  const { capture = true, detectIframe = false } = options
+  const { ignore = [], capture = true, detectIframe = false } = options
 
   if (!window)
     return
@@ -44,13 +43,28 @@ export function onClickOutside<T extends OnClickOutsideOptions>(
     window.document.documentElement.addEventListener('click', noop)
   }
 
+  const shouldIgnore = (event: PointerEvent) => {
+    return ignore.some((target) => {
+      if (typeof target === 'string') {
+        return Array.from(window.document.querySelectorAll(target)).some(
+          el => el === event.target || event.composedPath().includes(el),
+        )
+      }
+      const el = target
+      return el && (event.target === el || event.composedPath().includes(el))
+    })
+  }
+
   let shouldListen = true
 
   const listener = (event: PointerEvent) => {
-    const el = Array.isArray(target) ? target.find(el => el.contains(event.target as Node)) : target
+    const el = target
 
     if (!el || el === event.target || event.composedPath().includes(el))
       return
+
+    if (event.detail === 0)
+      shouldListen = !shouldIgnore(event)
 
     if (!shouldListen) {
       shouldListen = true
@@ -66,16 +80,16 @@ export function onClickOutside<T extends OnClickOutsideOptions>(
       window,
       'pointerdown',
       (e) => {
-        const el = Array.isArray(target) ? target.find(el => el.contains(e.target as Node)) : target
+        const el = target
         if (el)
-          shouldListen = !e.composedPath().includes(el)
+          shouldListen = !e.composedPath().includes(el) && !shouldIgnore(e)
       },
       { passive: true },
     ),
     detectIframe
     && useEventListener(window, 'blur', (event) => {
       setTimeout(() => {
-        const el = Array.isArray(target) ? target.find(el => el.contains(event.target as Node)) : target
+        const el = target
         if (
           window.document.activeElement?.tagName === 'IFRAME'
           && !el?.contains(window.document.activeElement)
@@ -87,6 +101,8 @@ export function onClickOutside<T extends OnClickOutsideOptions>(
   ].filter(Boolean) as Fn[]
 
   const stop = () => cleanup.forEach(fn => fn())
+
+  onCleanup(stop)
 
   return stop
 }
