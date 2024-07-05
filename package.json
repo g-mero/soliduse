@@ -1,7 +1,7 @@
 {
   "name": "solid-uses",
   "type": "module",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "private": false,
   "description": "Try make a tiny vueuse port for SolidJS",
   "license": "MIT",
@@ -11,19 +11,27 @@
     "vueuse",
     "utils"
   ],
-  "module": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "exports": {
+    "import": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "typesVersions": {},
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "replace": "node scripts/replacePath.cjs",
-    "build": "vite build && tsc -p ./tsconfig.types.json && node scripts/replacePath.cjs",
+    "build": "tsup --dts",
     "serve": "vite preview"
   },
-  "dependencies": {
-
-  },
+  "dependencies": {},
   "devDependencies": {
     "@antfu/eslint-config": "^2.21.1",
     "@types/node": "^20.14.2",
@@ -32,10 +40,13 @@
     "eslint": "^8.57.0",
     "eslint-plugin-solid": "^0.14.1",
     "solid-js": "^1.8.17",
+    "tsup": "^8.1.0",
+    "tsup-preset-solid": "^2.2.0",
     "typescript": "^5.4.5",
     "unocss": "^0.61.0",
     "unplugin-auto-import": "^0.17.6",
     "vite": "^5.3.1",
     "vite-plugin-solid": "^2.10.2"
-  }
+  },
+  "browser": {}
 }
