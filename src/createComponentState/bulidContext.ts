@@ -1,5 +1,5 @@
 /* eslint-disable no-prototype-builtins */
-/* eslint-disable ts/ban-types */
+
 import { type EffectOptions, createComponent, getOwner, runWithOwner } from 'solid-js'
 import type { SetStoreFunction } from 'solid-js/store'
 
@@ -44,7 +44,7 @@ export function buildRealState<T extends object, M extends Methods >(state: () =
         // @ts-expect-error xxx
         realState[1][key] = (...args: any[]) => {
           // @ts-expect-error xxx
-          methods[key].apply({
+          return methods[key].apply({
             state: realState[0],
             actions: realState[1],
           }, args)
@@ -58,6 +58,7 @@ export function buildRealState<T extends object, M extends Methods >(state: () =
   return realState
 }
 
+// eslint-disable-next-line ts/no-empty-object-type
 export function buildContext<T extends object, M extends Methods = {}>(
   state: () => T,
   methods?: M & ThisType<RealContextThis<T, M>>,
