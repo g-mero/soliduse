@@ -58,7 +58,7 @@ export function buildRealState<T extends object, M extends Methods >(state: () =
   return realState
 }
 
-// eslint-disable-next-line ts/no-empty-object-type
+// eslint-disable-next-line ts/ban-types
 export function buildContext<T extends object, M extends Methods = {}>(
   state: () => T,
   methods?: M & ThisType<RealContextThis<T, M>>,
