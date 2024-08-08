@@ -1,7 +1,7 @@
 {
   "name": "solid-uses",
   "type": "module",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "private": false,
   "description": "Try make a tiny vueuse port for SolidJS",
   "license": "MIT",
