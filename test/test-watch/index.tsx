@@ -1,12 +1,13 @@
+import type { AccessorArray } from 'solid-js'
 import watch from '@/watch'
 
 export function TestWatch() {
   const [a, setA] = createSignal(0)
-  const [b, setB] = createSignal(0)
+  const [b, setB] = createSignal('0')
   const [c, setC] = createSignal(0)
 
-  watch([a, b], () => {
-    console.log(a, b, c)
+  watch([a, b] as AccessorArray<any>, () => {
+    console.log(1)
   })
   return (
     <div>
