@@ -1,11 +1,8 @@
 /* eslint-disable ts/ban-types */
+import type { Methods } from '../createComponentState/bulidContext'
 import { buildRealState } from '../createComponentState/bulidContext'
 
-type Methods<T> = {
-  [K in keyof T as `set${Capitalize<string & K>}`]?: undefined;
-} & { setState?: undefined, [key: string]: ((...args: any[]) => void) | undefined }
-
-export function createGlobalState<T extends object, M extends Methods<T> = {}>(
+export function createGlobalState<T extends object, M extends Methods = {}>(
   state: () => T,
   methods?: M,
 ) {

@@ -3,7 +3,7 @@
 import { type EffectOptions, createComponent, getOwner, runWithOwner } from 'solid-js'
 import type { SetStoreFunction } from 'solid-js/store'
 
-interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
+export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
 
 // 定义一个泛型类型，用于对象的键和值
 type Setter<T> = {
@@ -22,7 +22,8 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-export function buildRealState<T extends object, M extends Methods >(state: () => T, methods?: M & ThisType<RealContextThis<T, M>>): RealState<T, M> {
+// eslint-disable-next-line ts/ban-types
+export function buildRealState<T extends object, M extends Methods = {} >(state: () => T, methods?: M & ThisType<RealContextThis<T, M>>): RealState<T, M> {
   const [state2, setState] = createStore(state())
 
   const realState = [state2, {}] as RealState<T, M>
