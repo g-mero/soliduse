@@ -1,0 +1,6 @@
+export function getBrowserApi<T extends keyof Window>(windowApi: T): Window[T] | null {
+  if (!isServer) {
+    return window[windowApi]
+  }
+  return null
+}

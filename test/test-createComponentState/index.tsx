@@ -8,7 +8,11 @@ export default function TestCreateComponentState() {
   useIntervalFn(() => { actions.increase() }, 1000)
   return (
     <TestState.Provider>
-      <h1>{state.count}</h1>
+      <h1>
+        {state.count}
+        {' '}
+        {state.test}
+      </h1>
     </TestState.Provider>
   )
 }

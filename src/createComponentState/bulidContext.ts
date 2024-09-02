@@ -2,6 +2,8 @@
 
 import { type EffectOptions, createComponent, getOwner, runWithOwner } from 'solid-js'
 import type { SetStoreFunction } from 'solid-js/store'
+import { getBrowserApi } from '@/utils/getBrowserApi'
+import watch from '@/watch'
 
 export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
 
@@ -11,6 +13,13 @@ type Setter<T> = {
 }
 
 export type RealState<T, M> = [Readonly<T>, Omit<M, 'setState'> & Omit<Setter<T>, keyof M> & { setState: SetStoreFunction<T> }]
+
+export interface BuildContextOption {
+  useStorage?: {
+    type?: 'localStorage' | 'sessionStorage'
+    key: string
+  }
+}
 
 export interface RealContextThis<T, M> {
   state: RealState<T, M>[0]
@@ -22,7 +31,6 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
-// eslint-disable-next-line ts/ban-types
 export function buildRealState<T extends object, M extends Methods = {} >(state: () => T, methods?: M & ThisType<RealContextThis<T, M>>): RealState<T, M> {
   const [state2, setState] = createStore(state())
 
@@ -59,13 +67,12 @@ export function buildRealState<T extends object, M extends Methods = {} >(state:
   return realState
 }
 
-// eslint-disable-next-line ts/ban-types
 export function buildContext<T extends object, M extends Methods = {}>(
   state: () => T,
   methods?: M & ThisType<RealContextThis<T, M>>,
-  options?: EffectOptions,
+  options?: BuildContextOption,
 ) {
-  const context = createContext([{}, {}] as RealState<T, M>, options)
+  const context = createContext([{}, {}] as RealState<T, M>)
 
   const useThisContext = () => {
     return useContext(context)
@@ -74,7 +81,47 @@ export function buildContext<T extends object, M extends Methods = {}>(
   return {
     useContext: useThisContext,
     initial() {
+      if (options?.useStorage) {
+        const storage = getBrowserApi(options?.useStorage.type || 'localStorage')
+        if (storage) {
+          const value = storage.getItem(options?.useStorage.key)
+          if (value) {
+            try {
+              const parsedValue = JSON.parse(value)
+              if (parsedValue) {
+                const initialState = state()
+                state = () => Object.assign(initialState, parsedValue)
+              }
+            }
+            catch (error) {
+              storage.setItem(options?.useStorage.key, JSON.stringify(state()))
+            }
+          }
+          else {
+            storage.setItem(options?.useStorage.key, JSON.stringify(state()))
+          }
+        }
+      }
+
       const value = buildRealState(state, methods)
+      if (options?.useStorage) {
+        const [s] = value
+
+        const buildKeys = () => {
+          const keys: (keyof typeof s)[] = Object.keys(s) as any
+          return keys.map((key) => { return () => s[key] })
+        }
+
+        watch([...buildKeys()], () => {
+          const storage = getBrowserApi(options.useStorage?.type || 'localStorage')
+          if (storage) {
+            const key = options.useStorage?.key
+            if (key) {
+              storage.setItem(key, JSON.stringify(s))
+            }
+          }
+        })
+      }
       return { Provider(props: any) {
         return createComponent(context.Provider, { value, get children() { return props.children } })
       }, value }
