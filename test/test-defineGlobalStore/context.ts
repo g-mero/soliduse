@@ -5,7 +5,13 @@ const context = defineGlobalStore('test', {
     count: 0,
     text: 'hello',
   }),
-  methods: {
+  getters: {
+    getAll() {
+      console.log(1)
+      return `${this.state.count} ${this.state.text}`
+    },
+  },
+  actions: {
     increment() {
       this.actions.setState('count', this.state.count + 1)
     },

@@ -1,55 +1,49 @@
-/* eslint-disable no-prototype-builtins */
-
 import { createComponent } from 'solid-js'
 import type { SetStoreFunction } from 'solid-js/store'
 
 export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
 
-// 定义一个泛型类型，用于对象的键和值
-type Setter<T> = {
-  [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void;
+export type RealState<T, G, M> = [Readonly<T>, G & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> }]
+
+export interface Getters { [key: string]: ((...args: any[]) => any) }
+export interface RealContextThis<T, G, M> {
+  state: RealState<T, G, M>[0]
+  actions: RealState<T, G, M>[1]
 }
 
-export type RealState<T, M> = [Readonly<T>, Omit<M, 'setState'> & Omit<Setter<T>, keyof M> & { setState: SetStoreFunction<T> }]
+export function buildRealState<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
+  state: () => T
+  getters?: G & ThisType<RealContextThis<T, G, M>>
+  methods?: M & ThisType<RealContextThis<T, G, M>>
+}): RealState<T, G, M> {
+  const { state, methods, getters } = params
 
-export interface RealContextThis<T, M> {
-  state: RealState<T, M>[0]
-  actions: RealState<T, M>[1]
-}
-
-// 辅助函数，用于首字母大写
-function capitalize(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-export function buildRealState<T extends object, M extends Methods = {} >(state: () => T, methods?: M & ThisType<RealContextThis<T, M>>): RealState<T, M> {
   const [state2, setState] = createStore(state())
 
-  const realState = [state2, {}] as RealState<T, M>
+  const realState = [state2, {}] as RealState<T, G, M>
 
-  for (const key in state2) {
-    if (state2.hasOwnProperty(key)) {
-      const setterName = `set${capitalize(key)}` as keyof Setter<T>
+  if (methods) {
+    for (const key in methods) {
       // @ts-expect-error xxx
-      realState[1][setterName] = (value: T[keyof T]) => {
+      realState[1][key] = (...args: any[]) => {
         // @ts-expect-error xxx
-        setState(key, value)
+        return methods[key].apply({
+          state: realState[0],
+          actions: realState[1],
+        }, args)
       }
     }
   }
 
-  if (methods) {
-    for (const key in methods) {
-      if (methods.hasOwnProperty(key)) {
-        // @ts-expect-error xxx
-        realState[1][key] = (...args: any[]) => {
-          // @ts-expect-error xxx
-          return methods[key].apply({
-            state: realState[0],
-            actions: realState[1],
-          }, args)
-        }
-      }
+  if (getters) {
+    for (const key in getters) {
+      // @ts-expect-error xxx
+      realState[1][key] = createMemo((...args: any[]) => {
+        return getters[key].apply({
+          state: realState[0],
+          actions: realState[1],
+        }, args)
+      })
     }
   }
 
@@ -58,11 +52,12 @@ export function buildRealState<T extends object, M extends Methods = {} >(state:
   return realState
 }
 
-export function buildContext<T extends object, M extends Methods = {}>(
-  state: () => T,
-  methods?: M & ThisType<RealContextThis<T, M>>,
-) {
-  const context = createContext([{}, {}] as RealState<T, M>)
+export function buildContext<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
+  state: () => T
+  getters?: G & ThisType<RealContextThis<T, G, M>>
+  methods?: M & ThisType<RealContextThis<T, G, M>>
+}) {
+  const context = createContext([{}, {}] as RealState<T, G, M>)
 
   const useThisContext = () => {
     return useContext(context)
@@ -71,7 +66,7 @@ export function buildContext<T extends object, M extends Methods = {}>(
   return {
     useContext: useThisContext,
     initial() {
-      const value = buildRealState(state, methods)
+      const value = buildRealState(params)
 
       return { Provider(props: any) {
         return createComponent(context.Provider, { value, get children() { return props.children } })

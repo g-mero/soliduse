@@ -1,37 +1,33 @@
-import { type Methods, type RealContextThis, buildRealState } from '@/createComponentState/bulidContext'
+import { type Getters, type Methods, type RealContextThis, buildRealState } from '@/createComponentState/bulidContext'
 import useEventListener from '@/useEventListener'
 import { getBrowserApi } from '@/utils/getBrowserApi'
 import watch from '@/watch'
 
-export interface BuildContextOption {
-  useStorage?: {
-    type?: 'localStorage' | 'sessionStorage'
-    key: string
-  }
-}
-
-function defineGlobalStore<T extends object, M extends Methods = {}>(
+function defineGlobalStore<T extends object, M extends Methods = {}, G extends Getters = {}>(
   name: string,
   params: {
     state: () => T
-    methods?: M & ThisType<RealContextThis<T, M>>
+    getters?: G & ThisType<RealContextThis<T, G, M>>
+    actions?: M & ThisType<RealContextThis<T, G, M>>
     persist?: 'sessionStorage' | 'localStorage'
   },
 ) {
-  const { state, methods, persist } = params
-  const context = buildRealState(state, methods)
+  // use createRoot to prevent console warning
+  // actually, it never dispose as same as not use this method
+  return createRoot(() => {
+    const context = buildRealState(params)
 
-  if (persist) {
-    const storage = getBrowserApi(persist || 'localStorage')
-    if (storage) {
-      const [s, actions] = context
+    if (params.persist) {
+      const storage = getBrowserApi(params.persist || 'localStorage')
+      if (storage) {
+        const [s, actions] = context
 
-      const buildKeys = () => {
-        const keys: (keyof typeof s)[] = Object.keys(s) as any
-        return keys.map((key) => { return () => s[key] })
-      }
+        const buildKeys = () => {
+          const keys: (keyof typeof s)[] = Object.keys(s) as any
+          return keys.map((key) => { return () => s[key] })
+        }
 
-      createRoot(() => {
+        // onMount for ssr compatibility
         onMount(() => {
           const key = name
           if (!key)
@@ -70,11 +66,11 @@ function defineGlobalStore<T extends object, M extends Methods = {}>(
             }
           })
         })
-      })
+      }
     }
-  }
 
-  return context
+    return context
+  })
 }
 
 export default defineGlobalStore

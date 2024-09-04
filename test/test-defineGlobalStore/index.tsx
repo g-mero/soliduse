@@ -11,6 +11,8 @@ export default function TestDefineGlobalStore() {
         {state.count}
         {' '}
         {state.text}
+        {actions.getAll()}
+        {actions.getAll()}
       </h1>
     </div>
 
