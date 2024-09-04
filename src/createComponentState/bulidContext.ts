@@ -1,10 +1,7 @@
 /* eslint-disable no-prototype-builtins */
 
-import { type EffectOptions, createComponent, getOwner, runWithOwner } from 'solid-js'
+import { createComponent } from 'solid-js'
 import type { SetStoreFunction } from 'solid-js/store'
-import { getBrowserApi } from '@/utils/getBrowserApi'
-import watch from '@/watch'
-import useEventListener from '@/useEventListener'
 
 export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
 
@@ -14,13 +11,6 @@ type Setter<T> = {
 }
 
 export type RealState<T, M> = [Readonly<T>, Omit<M, 'setState'> & Omit<Setter<T>, keyof M> & { setState: SetStoreFunction<T> }]
-
-export interface BuildContextOption {
-  useStorage?: {
-    type?: 'localStorage' | 'sessionStorage'
-    key: string
-  }
-}
 
 export interface RealContextThis<T, M> {
   state: RealState<T, M>[0]
@@ -71,7 +61,6 @@ export function buildRealState<T extends object, M extends Methods = {} >(state:
 export function buildContext<T extends object, M extends Methods = {}>(
   state: () => T,
   methods?: M & ThisType<RealContextThis<T, M>>,
-  options?: BuildContextOption,
 ) {
   const context = createContext([{}, {}] as RealState<T, M>)
 
@@ -83,58 +72,7 @@ export function buildContext<T extends object, M extends Methods = {}>(
     useContext: useThisContext,
     initial() {
       const value = buildRealState(state, methods)
-      if (options?.useStorage) {
-        const storage = getBrowserApi(options.useStorage?.type || 'localStorage')
-        if (storage) {
-          const [s, actions] = value
 
-          const buildKeys = () => {
-            const keys: (keyof typeof s)[] = Object.keys(s) as any
-            return keys.map((key) => { return () => s[key] })
-          }
-
-          onMount(() => {
-            const key = options.useStorage?.key
-            if (!key)
-              return
-
-            const stored = storage.getItem(key)
-            if (stored) {
-              try {
-                const storedState = JSON.parse(stored)
-                for (const key in storedState) {
-                  if (storedState.hasOwnProperty(key)) {
-                    actions.setState(key as any, storedState[key])
-                  }
-                }
-              }
-              catch (e) {
-                storage.setItem(key, JSON.stringify(s))
-              }
-            }
-
-            watch([...buildKeys()], () => {
-              storage.setItem(key, JSON.stringify(s))
-            })
-
-            useEventListener('storage', (e) => {
-              if (e.key === key) {
-                try {
-                  console.log(1)
-
-                  const storedState = JSON.parse(e.newValue || '')
-                  for (const key in storedState) {
-                    actions.setState(key as any, storedState[key])
-                  }
-                }
-                catch (e) {
-                  storage.setItem(key, JSON.stringify(s))
-                }
-              }
-            })
-          })
-        }
-      }
       return { Provider(props: any) {
         return createComponent(context.Provider, { value, get children() { return props.children } })
       }, value }
