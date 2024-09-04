@@ -3,12 +3,21 @@ import type { SetStoreFunction } from 'solid-js/store'
 
 export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
 
-export type RealState<T, G, M> = [Readonly<T>, G & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> }]
+export type RealState<T, G, M> = [Readonly<T>, Setter<T> & G & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> }]
 
 export interface Getters { [key: string]: ((...args: any[]) => any) }
 export interface RealContextThis<T, G, M> {
   state: RealState<T, G, M>[0]
   actions: RealState<T, G, M>[1]
+}
+
+type Setter<T> = {
+  [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void;
+}
+
+// 辅助函数，用于首字母大写
+function capitalize(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
 export function buildRealState<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
@@ -21,6 +30,15 @@ export function buildRealState<T extends object, M extends Methods = {}, G exten
   const [state2, setState] = createStore(state())
 
   const realState = [state2, {}] as RealState<T, G, M>
+
+  for (const key in state2) {
+    const setterName = `set${capitalize(key)}`
+    // @ts-expect-error xxx
+    realState[1][setterName] = (value: T[keyof T]) => {
+      // @ts-expect-error xxx
+      setState(key, value)
+    }
+  }
 
   if (methods) {
     for (const key in methods) {
