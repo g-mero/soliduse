@@ -8,7 +8,7 @@ function defineGlobalStore<T extends object, M extends Methods = {}, G extends G
   params: {
     state: () => T
     getters?: G & ThisType<RealContextThis<T, G, M>>
-    actions?: M & ThisType<RealContextThis<T, G, M>>
+    methods?: M & ThisType<RealContextThis<T, G, M>>
     persist?: 'sessionStorage' | 'localStorage'
   },
 ) {
