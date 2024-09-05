@@ -5,6 +5,7 @@ import './index.css'
 import 'virtual:uno.css'
 import 'uno.css'
 import App from './App'
+import { enableGlobalStore } from '@/defineGlobalStore'
 
 const root = document.querySelector('#root')
 
@@ -15,3 +16,5 @@ if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
 }
 
 render(() => <App />, root!)
+
+enableGlobalStore()

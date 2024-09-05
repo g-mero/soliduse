@@ -1,7 +1,10 @@
 import { type Getters, type Methods, type RealContextThis, buildRealState } from '@/createComponentState/bulidContext'
 import useEventListener from '@/useEventListener'
 import { getBrowserApi } from '@/utils/getBrowserApi'
+import type { Fn } from '@/utils/types'
 import watch from '@/watch'
+
+const shouldRun: Fn[] = []
 
 function defineGlobalStore<T extends object, M extends Methods = {}, G extends Getters = {}>(
   name: string,
@@ -27,8 +30,7 @@ function defineGlobalStore<T extends object, M extends Methods = {}, G extends G
           return keys.map((key) => { return () => s[key] })
         }
 
-        // onMount for ssr compatibility
-        onMount(() => {
+        shouldRun.push(() => {
           const key = name
           if (!key)
             return
@@ -37,6 +39,7 @@ function defineGlobalStore<T extends object, M extends Methods = {}, G extends G
           if (stored) {
             try {
               const storedState = JSON.parse(stored)
+
               for (const key in storedState) {
                 if (Object.prototype.hasOwnProperty.call(s, key)) {
                   actions.setState(key as any, storedState[key])
@@ -73,4 +76,10 @@ function defineGlobalStore<T extends object, M extends Methods = {}, G extends G
   })
 }
 
-export default defineGlobalStore
+function enableGlobalStore() {
+  createRoot(() => {
+    shouldRun.forEach(fn => fn())
+  })
+}
+
+export { defineGlobalStore, enableGlobalStore }

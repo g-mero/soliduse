@@ -4,6 +4,10 @@ import useIntervalFn from '@/useIntervalFn'
 export default function TestDefineGlobalStore() {
   const [state, actions] = GlobalStore
 
+  onMount(() => {
+    console.log('inner')
+  })
+
   return (
     <div>
       <input type="range" value={state.count} onChange={e => actions.setState('count', Number(e.target.value))} />
@@ -11,8 +15,8 @@ export default function TestDefineGlobalStore() {
         {state.count}
         {' '}
         {state.text}
-        {actions.getAll()}
-        {actions.getAll()}
+        {state.getAll}
+        {state.getAll}
       </h1>
     </div>
 

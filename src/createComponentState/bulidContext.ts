@@ -3,10 +3,13 @@ import type { SetStoreFunction } from 'solid-js/store'
 
 export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
 
-export type RealState<T, G, M> = [Readonly<T>, Setter<T> & G & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> }]
+type GetterObj<T extends Getters> = { [K in keyof T]: ReturnType<T[K]> }
+
+export type RealState<T, G extends Getters, M> = [Readonly<T & GetterObj<G>>, Setter<T> & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> }]
 
 export interface Getters { [key: string]: ((...args: any[]) => any) }
-export interface RealContextThis<T, G, M> {
+
+export interface RealContextThis<T, G extends Getters, M> {
   state: RealState<T, G, M>[0]
   actions: RealState<T, G, M>[1]
 }
@@ -20,6 +23,20 @@ function capitalize(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1)
 }
 
+/**
+ * 动态添加 getter 方法到对象
+ * @param {object} obj - 目标对象
+ * @param {string} propName - getter 的名称
+ * @param {Function} getterFunction - getter 的实现逻辑
+ */
+function addGetter(obj: object, propName: string, getterFunction: () => any) {
+  Object.defineProperty(obj, propName, {
+    get: getterFunction,
+    enumerable: false, // 属性是否可枚举
+    configurable: true, // 属性是否可配置
+  })
+}
+
 export function buildRealState<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
   getters?: G & ThisType<RealContextThis<T, G, M>>
@@ -27,14 +44,36 @@ export function buildRealState<T extends object, M extends Methods = {}, G exten
 }): RealState<T, G, M> {
   const { state, methods, getters } = params
 
-  const [state2, setState] = createStore(state())
+  const newState = state()
+  const actions = {} as any
 
-  const realState = [state2, {}] as RealState<T, G, M>
+  const realGetters = {} as any
+  if (getters) {
+    for (const key in getters) {
+      addGetter(newState, key, () => {
+        return realGetters[key]()
+      })
+    }
+  }
+
+  const [state2, setState] = createStore(newState)
+
+  const realState = [state2, actions] as RealState<T, G, M>
+
+  if (getters) {
+    for (const key in getters) {
+      realGetters[key] = createMemo((...args: any[]) => {
+        return getters[key].apply({
+          state: state2,
+          actions,
+        }, args)
+      })
+    }
+  }
 
   for (const key in state2) {
     const setterName = `set${capitalize(key)}`
-    // @ts-expect-error xxx
-    realState[1][setterName] = (value: T[keyof T]) => {
+    actions[setterName] = (value: T[keyof T]) => {
       // @ts-expect-error xxx
       setState(key, value)
     }
@@ -46,26 +85,14 @@ export function buildRealState<T extends object, M extends Methods = {}, G exten
       realState[1][key] = (...args: any[]) => {
         // @ts-expect-error xxx
         return methods[key].apply({
-          state: realState[0],
-          actions: realState[1],
+          state: state2,
+          actions,
         }, args)
       }
     }
   }
 
-  if (getters) {
-    for (const key in getters) {
-      // @ts-expect-error xxx
-      realState[1][key] = createMemo((...args: any[]) => {
-        return getters[key].apply({
-          state: realState[0],
-          actions: realState[1],
-        }, args)
-      })
-    }
-  }
-
-  realState[1].setState = setState
+  actions.setState = setState
 
   return realState
 }

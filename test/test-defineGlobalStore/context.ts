@@ -1,4 +1,4 @@
-import defineGlobalStore from '@/defineGlobalStore'
+import { defineGlobalStore } from '@/defineGlobalStore'
 
 const context = defineGlobalStore('test', {
   state: () => ({
@@ -7,17 +7,18 @@ const context = defineGlobalStore('test', {
   }),
   getters: {
     getAll() {
-      console.log(1)
+      console.log(Object.keys(this.state))
       return `${this.state.count} ${this.state.text}`
     },
   },
-  actions: {
+  methods: {
     increment() {
       this.actions.setState('count', this.state.count + 1)
     },
     decrement() {
       this.actions.setState('count', this.state.count - 1)
     },
+
     setText(text: string) {
       this.actions.setState('text', text)
     },
