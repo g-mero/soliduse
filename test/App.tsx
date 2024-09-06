@@ -9,11 +9,12 @@ import TestCreateComponentState from './test-createComponentState'
 import TestOnClickOutside from './test-onClickOutside'
 import { TestWatch } from './test-watch'
 import TestDefineGlobalStore from './test-defineGlobalStore'
+import TestResizeObserver from './test-useResizeObserver'
 
 const App: Component = () => {
   return (
     <>
-      <TestDefineGlobalStore />
+      <TestResizeObserver />
     </>
   )
 }
