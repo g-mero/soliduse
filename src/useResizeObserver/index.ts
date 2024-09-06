@@ -1,10 +1,3 @@
-import { createMemo } from 'solid-js'
-
-export interface ResizeObserverSize {
-  readonly inlineSize: number
-  readonly blockSize: number
-}
-
 export interface UseResizeObserverOptions {
   /**
    * Sets which box model the observer will observe changes to. Possible values
