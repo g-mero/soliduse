@@ -59,9 +59,16 @@ function defineGlobalStore<T extends object, M extends Methods = {}, G extends G
             if (e.key === key) {
               try {
                 const storedState = JSON.parse(e.newValue || '')
+                const shouldSetKeys = []
                 for (const key in storedState) {
-                  actions.setState(key as any, storedState[key])
+                  if (s[key] !== storedState[key]) {
+                    shouldSetKeys.push(key)
+                  }
                 }
+
+                shouldSetKeys.forEach((key) => {
+                  actions.setState(key as any, storedState[key])
+                })
               }
               catch (e) {
                 storage.setItem(key, JSON.stringify(s))
