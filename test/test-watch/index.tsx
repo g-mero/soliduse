@@ -6,8 +6,8 @@ export function TestWatch() {
   const [b, setB] = createSignal('0')
   const [c, setC] = createSignal(0)
 
-  watch([a, b] as AccessorArray<any>, () => {
-    console.log(1)
+  watch(a, (input, prevInput) => {
+    console.log(prevInput)
   })
   return (
     <div>
