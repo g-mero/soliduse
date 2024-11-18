@@ -1,4 +1,5 @@
 import type { Stoppable } from '@/utils/types'
+import { createSignal, onCleanup } from 'solid-js'
 
 export default function useTimeoutFn(cb: () => void, timeout = 500): Stoppable {
   const [isPending, setIsPending] = createSignal(false)

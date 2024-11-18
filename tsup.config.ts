@@ -1,44 +1,31 @@
 // tsup.config.ts
-import { rm } from 'node:fs'
-import { defineConfig } from 'tsup'
-import * as preset from 'tsup-preset-solid'
-import AutoImport from 'unplugin-auto-import/esbuild'
+import { solidPlugin } from 'esbuild-plugin-solid'
+import { defineConfig, type Options } from 'tsup'
 
-const preset_options: preset.PresetOptions = {
-  // array or single object
-  entries: [
-    {
-      entry: 'src/index.ts',
+function generateConfig(jsx: boolean): Options {
+  return {
+    target: 'esnext',
+    platform: 'browser',
+    format: 'esm',
+    clean: true,
+    dts: !jsx,
+    entry: ['src/index.ts', 'src/*/index.ts'],
+    outDir: 'dist/',
+    treeshake: { preset: 'smallest' },
+    replaceNodeEnv: true,
 
+    esbuildOptions(options) {
+      if (jsx) {
+        options.jsx = 'preserve'
+      }
+      options.chunkNames = '[name]/[hash]'
+      options.drop = ['console', 'debugger']
     },
-  ],
-  // Set to `true` to remove all `console.*` calls and `debugger` statements in prod builds
-  drop_console: true,
-  // Set to `true` to generate a CommonJS build alongside ESM
-  cjs: false,
-  esbuild_plugins: [AutoImport({
-    imports: ['solid-js'],
-    dts: './auto-imports.d.ts',
-  })],
+    outExtension() {
+      return jsx ? { js: '.jsx' } : {}
+    },
+    esbuildPlugins: !jsx ? [solidPlugin({ solid: { generate: 'dom' } })] : [],
+  }
 }
 
-export default defineConfig((config) => {
-  rm('dist', { force: true, recursive: true }, () => {})
-
-  const watching = !!config.watch
-
-  const parsed_data = preset.parsePresetOptions(preset_options, watching)
-
-  if (!watching) {
-    const package_fields = preset.generatePackageExports(parsed_data)
-
-    console.log(`\npackage.json: \n${JSON.stringify(package_fields, null, 2)}\n\n`)
-
-    /*
-            will update ./package.json with the correct export fields
-        */
-    preset.writePackageJson(package_fields)
-  }
-
-  return preset.generateTsupOptions(parsed_data)
-})
+export default defineConfig([generateConfig(false)])

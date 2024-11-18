@@ -1,8 +1,10 @@
-import { type Getters, type Methods, type RealContextThis, buildRealState } from '@/createComponentState/bulidContext'
+/* eslint-disable ts/no-empty-object-type */
+import type { Fn } from '@/utils/types'
+import { buildRealState, type Getters, type Methods, type RealContextThis } from '@/createComponentState/bulidContext'
 import useEventListener from '@/useEventListener'
 import { getBrowserApi } from '@/utils/getBrowserApi'
-import type { Fn } from '@/utils/types'
 import watch from '@/watch'
+import { createRoot } from 'solid-js'
 
 const shouldRun: Fn[] = []
 
@@ -46,7 +48,7 @@ function defineGlobalStore<T extends object, M extends Methods = {}, G extends G
                 }
               }
             }
-            catch (e) {
+            catch {
               storage.setItem(key, JSON.stringify(s))
             }
           }
@@ -70,7 +72,7 @@ function defineGlobalStore<T extends object, M extends Methods = {}, G extends G
                   actions.setState(key as any, storedState[key])
                 })
               }
-              catch (e) {
+              catch {
                 storage.setItem(key, JSON.stringify(s))
               }
             }

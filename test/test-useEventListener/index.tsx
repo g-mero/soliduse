@@ -1,4 +1,5 @@
 import { useEventListener } from '@/useEventListener'
+import { createSignal, Show } from 'solid-js'
 
 function CorePage() {
   useEventListener(document, 'click', () => {

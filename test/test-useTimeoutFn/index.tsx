@@ -1,4 +1,5 @@
 import useTimeoutFn from '@/useTimeoutFn'
+import { createSignal } from 'solid-js'
 
 export default function TestUseTimeoutFn() {
   const [finished, setFinished] = createSignal(false)

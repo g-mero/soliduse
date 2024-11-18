@@ -1,4 +1,5 @@
 import useIntervalFn from '@/useIntervalFn'
+import { createSignal, onCleanup, Show } from 'solid-js'
 
 function CorePage() {
   const [count, setCount] = createSignal(0)

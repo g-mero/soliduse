@@ -1,4 +1,5 @@
 import { onClickOutside } from '@/onClickOutside'
+import { createSignal, onCleanup, onMount, Show } from 'solid-js'
 
 function CanClose(props: {
   setOpen: (open: boolean) => void

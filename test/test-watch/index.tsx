@@ -1,5 +1,5 @@
-import type { AccessorArray } from 'solid-js'
 import watch from '@/watch'
+import { createSignal } from 'solid-js'
 
 export function TestWatch() {
   const [a, setA] = createSignal(0)

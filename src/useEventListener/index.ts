@@ -1,5 +1,7 @@
-import { isObject, noop } from '@/utils/is'
+/* eslint-disable ts/no-unsafe-function-type */
 import type { Arrayable, Fn } from '@/utils/types'
+import { isObject, noop } from '@/utils/is'
+import { onCleanup } from 'solid-js'
 
 interface InferEventTarget<Events> {
   addEventListener: (event: Events, fn?: any, options?: any) => any

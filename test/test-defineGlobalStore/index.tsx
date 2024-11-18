@@ -1,5 +1,5 @@
+import { onMount } from 'solid-js'
 import GlobalStore from './context'
-import useIntervalFn from '@/useIntervalFn'
 
 export default function TestDefineGlobalStore() {
   const [state, actions] = GlobalStore

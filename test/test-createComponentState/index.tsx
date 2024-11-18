@@ -1,5 +1,4 @@
 import ComponentState from './state'
-import useIntervalFn from '@/useIntervalFn'
 
 export default function TestCreateComponentState() {
   const TestState = ComponentState.initial()

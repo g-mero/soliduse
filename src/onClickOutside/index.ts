@@ -1,6 +1,7 @@
+import type { Fn } from '@/utils/types'
 import useEventListener from '@/useEventListener'
 import { isIOS, noop } from '@/utils/is'
-import type { Fn } from '@/utils/types'
+import { onCleanup } from 'solid-js'
 
 export interface OnClickOutsideOptions {
   /**

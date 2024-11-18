@@ -1,5 +1,6 @@
-import { createComponent } from 'solid-js'
-import type { SetStoreFunction } from 'solid-js/store'
+import { createComponent, createContext, createMemo, useContext } from 'solid-js'
+/* eslint-disable ts/no-empty-object-type */
+import { createStore, type SetStoreFunction } from 'solid-js/store'
 
 export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
 

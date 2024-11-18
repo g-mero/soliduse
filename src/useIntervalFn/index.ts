@@ -1,3 +1,5 @@
+import { createSignal, onCleanup } from 'solid-js'
+
 export default function useIntervalFn(fn: () => void, delay = 500) {
   let id = setInterval(fn, delay)
   const [isActive, setIsActive] = createSignal(true)
