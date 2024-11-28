@@ -1,3 +1,4 @@
+import watch from '@/watch'
 import { createComponent, createContext, createMemo, useContext } from 'solid-js'
 /* eslint-disable ts/no-empty-object-type */
 import { createStore, type SetStoreFunction } from 'solid-js/store'
@@ -98,6 +99,8 @@ export function buildRealState<T extends object, M extends Methods = {}, G exten
   return realState
 }
 
+export type MaybeSignals<T> = T extends object ? { [K in keyof T]: T[K] | (() => T[K]) } : T
+
 export function buildContext<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
   getters?: G & ThisType<RealContextThis<T, G, M>>
@@ -111,8 +114,32 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
 
   return {
     useContext: useThisContext,
-    initial() {
-      const value = buildRealState(params)
+    initial(initialState?: Partial<MaybeSignals<T>>) {
+      const resolvedInitialState = {} as any
+      if (initialState) {
+        for (const key in initialState) {
+          const value = initialState[key]
+          resolvedInitialState[key] = typeof value === 'function' ? value() : value
+        }
+      }
+
+      const value = buildRealState({
+        state: () => ({ ...params.state(), ...resolvedInitialState }),
+        getters: params.getters,
+        methods: params.methods,
+      })
+
+      // watch
+      if (initialState) {
+        for (const key in initialState) {
+          const state = initialState[key]
+          if (typeof state === 'function') {
+            watch(state as any, (newValue) => {
+              value[1].setState(key, newValue)
+            })
+          }
+        }
+      }
 
       return { Provider(props: any) {
         return createComponent(context.Provider, { value, get children() { return props.children } })

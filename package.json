@@ -1,7 +1,7 @@
 {
   "name": "solid-uses",
   "type": "module",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "private": false,
   "description": "Try make a tiny vueuse port for SolidJS",
   "license": "MIT",
@@ -27,9 +27,9 @@
   "scripts": {
     "start": "vite",
     "dev": "vite",
-    "replace": "node scripts/replacePath.cjs",
     "build": "tsup --dts",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "pub": "pnpm build && pnpm publish"
   },
   "peerDependencies": {
     "solid-js": ">=1.9"
