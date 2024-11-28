@@ -124,7 +124,7 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
       }
 
       const value = buildRealState({
-        state: () => ({ ...params.state(), ...resolvedInitialState }),
+        state: () => ({ ...params.state(), ...resolvedInitialState }) as T,
         getters: params.getters,
         methods: params.methods,
       })
@@ -136,10 +136,10 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
           if (typeof state === 'function') {
             watch(state as any, (newValue) => {
               if (newValue === undefined) {
-                value[1].setState(key, params.state()[key])
+                value[1].setState(key as any, params.state()[key])
                 return
               }
-              value[1].setState(key, newValue)
+              value[1].setState(key as any, newValue)
             })
           }
         }
