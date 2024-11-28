@@ -99,7 +99,7 @@ export function buildRealState<T extends object, M extends Methods = {}, G exten
   return realState
 }
 
-export type MaybeSignals<T> = T extends object ? { [K in keyof T]: T[K] | (() => T[K]) } : T
+export type MaybeSignals<T extends object> = { [K in keyof T]: T[K] | (() => T[K] | undefined) }
 
 export function buildContext<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
@@ -135,6 +135,10 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
           const state = initialState[key]
           if (typeof state === 'function') {
             watch(state as any, (newValue) => {
+              if (newValue === undefined) {
+                value[1].setState(key, params.state()[key])
+                return
+              }
               value[1].setState(key, newValue)
             })
           }

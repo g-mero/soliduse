@@ -17,7 +17,7 @@ function TestProps(props: {
   count?: number
 }) {
   const TestState = ComponentState.initial({
-    count: () => props.count || 0,
+    count: () => props.count,
   })
 
   const [state, actions] = TestState.value
