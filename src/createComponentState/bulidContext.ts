@@ -7,7 +7,7 @@ export interface Methods { setState?: undefined, [key: string]: ((...args: any[]
 
 type GetterObj<T extends Getters> = { [K in keyof T]: ReturnType<T[K]> }
 
-export type RealState<T, G extends Getters, M> = [Readonly<T & GetterObj<G>>, Setter<T> & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> }]
+export type RealState<T, G extends Getters, M> = [Readonly<T & GetterObj<G>>, Omit<Setter<T>, keyof M> & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> }]
 
 export interface Getters { [key: string]: ((...args: any[]) => any) }
 
