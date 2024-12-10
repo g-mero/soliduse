@@ -149,5 +149,6 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
         return createComponent(context.Provider, { value, get children() { return props.children } })
       }, value }
     },
+    defaultValue: params.state,
   }
 }
