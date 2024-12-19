@@ -42,7 +42,7 @@ function addGetter(obj: object, propName: string, getterFunction: () => any) {
 
 export function buildRealState<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
-  getters?: G & ThisType<RealContextThis<T, G, M>>
+  getters?: G & ThisType<Omit<RealContextThis<T, G, M>, 'actions'>>
   methods?: M & ThisType<RealContextThis<T, G, M>>
 }): RealState<T, G, M> {
   const { state, methods, getters } = params
@@ -68,7 +68,6 @@ export function buildRealState<T extends object, M extends Methods = {}, G exten
       realGetters[key] = createMemo((...args: any[]) => {
         return getters[key].apply({
           state: state2,
-          actions,
         }, args)
       })
     }
@@ -104,7 +103,7 @@ export type MaybeSignals<T extends object> = { [K in keyof T]: T[K] | (() => T[K
 
 export function buildContext<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
-  getters?: G & ThisType<RealContextThis<T, G, M>>
+  getters?: G & ThisType<Omit<RealContextThis<T, G, M>, 'actions'>>
   methods?: M & ThisType<RealContextThis<T, G, M>>
 }) {
   const context = createContext([{}, {}] as RealState<T, G, M>)

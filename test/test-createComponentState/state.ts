@@ -12,7 +12,6 @@ const ComponentState = createComponentState({
     },
     testArrayOne() {
       console.log(this.state.testArray)
-
       return this.state.testArray?.[0]
     },
   },
