@@ -1,3 +1,4 @@
+import { isDef } from '@/utils/is'
 import watch from '@/watch'
 import { createComponent, createContext, createMemo, useContext } from 'solid-js'
 /* eslint-disable ts/no-empty-object-type */
@@ -119,7 +120,10 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
       if (initialState) {
         for (const key in initialState) {
           const value = initialState[key]
-          resolvedInitialState[key] = typeof value === 'function' ? value() : value
+          const realValue = typeof value === 'function' ? value() : value
+          if (isDef(realValue)) {
+            resolvedInitialState[key] = realValue
+          }
         }
       }
 
@@ -140,7 +144,7 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
                 return
               }
               value[1].setState(key as any, newValue)
-            })
+            }, { defer: true })
           }
         }
       }

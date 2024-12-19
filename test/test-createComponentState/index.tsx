@@ -1,13 +1,11 @@
-import useIntervalFn from '@/useIntervalFn'
 import watch from '@/watch'
-import { createSignal } from 'solid-js'
 import ComponentState from './state'
 
 function CheckValue() {
   const [state] = ComponentState.useContext()
 
-  watch(() => state.count, (count) => {
-    console.log('count:', count)
+  watch(() => state.doubleCount, (doubleCount) => {
+    console.log('doubleCount:', doubleCount)
   })
 
   return <></>
@@ -15,9 +13,11 @@ function CheckValue() {
 
 function TestProps(props: {
   count?: number
+  testArray?: string[]
 }) {
   const TestState = ComponentState.initial({
     count: () => props.count,
+    testArray: () => props.testArray,
   })
 
   const [state, actions] = TestState.value
@@ -36,10 +36,7 @@ function TestProps(props: {
 }
 
 export default function TestCreateComponentState() {
-  const [count, setCount] = createSignal(24)
-
-  useIntervalFn(() => { setCount(count() + 1) }, 1000)
   return (
-    <TestProps count={count()} />
+    <TestProps count={24} />
   )
 }
