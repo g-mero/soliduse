@@ -138,12 +138,13 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
           const state = initialState[key]
           if (typeof state === 'function') {
             watch(state as any, (newValue) => {
-              if (newValue === undefined) {
-                value[1].setState(key as any, params.state()[key])
+              let realValue = newValue
+              if (!isDef(newValue)) {
+                realValue = params.state()[key]
                 return
               }
-              value[1].setState(key as any, newValue)
-            }, { defer: true })
+              value[0][key] !== realValue && value[1].setState(key as any, newValue)
+            })
           }
         }
       }
