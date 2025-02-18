@@ -13,8 +13,8 @@ function defineGlobalStore<T extends object, U extends object = {}, M extends Me
   params: {
     state: () => T
     nowrapData?: U
-    getters?: G & ThisType<Omit<RealContextThis<T, G, M>, 'actions'>>
-    methods?: M & ThisType<RealContextThis<T, G, M>>
+    getters?: G & ThisType<Omit<RealContextThis<T, U, G, M>, 'actions'>>
+    methods?: M & ThisType<RealContextThis<T, U, G, M>>
     persist?: 'sessionStorage' | 'localStorage'
   },
 ) {

@@ -12,9 +12,10 @@ export type RealState<T, G extends Getters, M> = [Readonly<T & GetterObj<G>>, Om
 
 export interface Getters { [key: string]: ((...args: any[]) => any) }
 
-export interface RealContextThis<T, G extends Getters, M> {
+export interface RealContextThis<T, U, G extends Getters, M> {
   state: RealState<T, G, M>[0]
   actions: RealState<T, G, M>[1]
+  nowrapData: U
 }
 
 type Setter<T> = {
@@ -43,8 +44,8 @@ function addGetter(obj: object, propName: string, getterFunction: () => any) {
 export function buildRealState<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
   nowrapData?: U
-  getters?: G & ThisType<Omit<RealContextThis<T, G, M>, 'actions'>>
-  methods?: M & ThisType<RealContextThis<T, G, M>>
+  getters?: G & ThisType<Omit<RealContextThis<T, U, G, M>, 'actions'>>
+  methods?: M & ThisType<RealContextThis<T, U, G, M>>
 }): [...RealState<T, G, M>, U] {
   const { state, methods, getters } = params
 
@@ -69,6 +70,7 @@ export function buildRealState<T extends object, U extends object = {}, M extend
       realGetters[key] = createMemo((...args: any[]) => {
         return getters[key].apply({
           state: state2,
+          nowrapData: params.nowrapData,
         }, args)
       })
     }
@@ -90,6 +92,7 @@ export function buildRealState<T extends object, U extends object = {}, M extend
         return methods[key].apply({
           state: state2,
           actions,
+          nowrapData: params.nowrapData,
         }, args)
       }
     }
@@ -105,8 +108,8 @@ export type MaybeSignals<T extends object> = { [K in keyof T]: T[K] | (() => T[K
 export function buildContext<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
   nowrapData?: U
-  getters?: G & ThisType<Omit<RealContextThis<T, G, M>, 'actions'>>
-  methods?: M & ThisType<RealContextThis<T, G, M>>
+  getters?: G & ThisType<Omit<RealContextThis<T, U, G, M>, 'actions'>>
+  methods?: M & ThisType<RealContextThis<T, U, G, M>>
 }) {
   const context = createContext([{}, {}, {}] as [...RealState<T, G, M>, U])
 
