@@ -20,6 +20,9 @@ const ComponentState = createComponentState({
       return value
     },
   },
+  nowrapData: {
+    untrack: 'untrack',
+  },
 })
 
 export default ComponentState

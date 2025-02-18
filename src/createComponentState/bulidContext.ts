@@ -40,11 +40,12 @@ function addGetter(obj: object, propName: string, getterFunction: () => any) {
   })
 }
 
-export function buildRealState<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
+export function buildRealState<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
+  nowrapData?: U
   getters?: G & ThisType<Omit<RealContextThis<T, G, M>, 'actions'>>
   methods?: M & ThisType<RealContextThis<T, G, M>>
-}): RealState<T, G, M> {
+}): [...RealState<T, G, M>, U] {
   const { state, methods, getters } = params
 
   const newState = state()
@@ -96,17 +97,18 @@ export function buildRealState<T extends object, M extends Methods = {}, G exten
 
   actions.setState = setState
 
-  return realState
+  return [...realState, (params.nowrapData || {}) as U]
 }
 
 export type MaybeSignals<T extends object> = { [K in keyof T]: T[K] | (() => T[K] | undefined) }
 
-export function buildContext<T extends object, M extends Methods = {}, G extends Getters = {} >(params: {
+export function buildContext<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {} >(params: {
   state: () => T
+  nowrapData?: U
   getters?: G & ThisType<Omit<RealContextThis<T, G, M>, 'actions'>>
   methods?: M & ThisType<RealContextThis<T, G, M>>
 }) {
-  const context = createContext([{}, {}] as RealState<T, G, M>)
+  const context = createContext([{}, {}, {}] as [...RealState<T, G, M>, U])
 
   const useThisContext = () => {
     return useContext(context)
@@ -128,6 +130,7 @@ export function buildContext<T extends object, M extends Methods = {}, G extends
 
       const value = buildRealState({
         state: () => ({ ...params.state(), ...resolvedInitialState }) as T,
+        nowrapData: params.nowrapData,
         getters: params.getters,
         methods: params.methods,
       })

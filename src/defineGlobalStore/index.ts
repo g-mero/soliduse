@@ -8,10 +8,11 @@ import { createRoot } from 'solid-js'
 
 const shouldRun: Fn[] = []
 
-function defineGlobalStore<T extends object, M extends Methods = {}, G extends Getters = {}>(
+function defineGlobalStore<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {}>(
   name: string,
   params: {
     state: () => T
+    nowrapData?: U
     getters?: G & ThisType<Omit<RealContextThis<T, G, M>, 'actions'>>
     methods?: M & ThisType<RealContextThis<T, G, M>>
     persist?: 'sessionStorage' | 'localStorage'
