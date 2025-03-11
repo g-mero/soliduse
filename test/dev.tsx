@@ -1,11 +1,11 @@
+import { enableGlobalStore } from '@/defineGlobalStore'
+
 /* @refresh reload */
 import { render } from 'solid-js/web'
-
+import App from './App'
 import './index.css'
 import 'virtual:uno.css'
 import 'uno.css'
-import App from './App'
-import { enableGlobalStore } from '@/defineGlobalStore'
 
 const root = document.querySelector('#root')
 

@@ -3,7 +3,10 @@ import { createSignal, onCleanup, Show } from 'solid-js'
 
 function CorePage() {
   const [count, setCount] = createSignal(0)
-  const { resume, pause, isActive } = useIntervalFn(() => { setCount(count() + 1); console.log('interval') }, 1000)
+  const { resume, pause, isActive } = useIntervalFn(() => {
+    setCount(count() + 1)
+    console.log('interval')
+  }, 1000)
 
   onCleanup(() => {
     console.log('cleanup')

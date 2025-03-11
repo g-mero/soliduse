@@ -1,6 +1,7 @@
 /* eslint-disable ts/no-empty-object-type */
+import type { Getters, Methods, RealContextThis } from '@/createComponentState/buildContext'
 import type { Fn } from '@/utils/types'
-import { buildRealState, type Getters, type Methods, type RealContextThis } from '@/createComponentState/bulidContext'
+import { buildRealState } from '@/createComponentState/buildContext'
 import useEventListener from '@/useEventListener'
 import { getBrowserApi } from '@/utils/getBrowserApi'
 import watch from '@/watch'
@@ -30,7 +31,9 @@ function defineGlobalStore<T extends object, U extends object = {}, M extends Me
 
         const buildKeys = () => {
           const keys: (keyof typeof s)[] = Object.keys(s) as any
-          return keys.map((key) => { return () => s[key] })
+          return keys.map((key) => {
+            return () => s[key]
+          })
         }
 
         shouldRun.push(() => {

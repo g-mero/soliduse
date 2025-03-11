@@ -1,8 +1,8 @@
 import path from 'node:path'
+import { presetUno } from 'unocss'
+import UnoCSS from 'unocss/vite'
 import { defineConfig } from 'vite'
 import solidPlugin from 'vite-plugin-solid'
-import UnoCSS from 'unocss/vite'
-import { presetUno } from 'unocss'
 
 export default defineConfig(({ command }) => {
   return {

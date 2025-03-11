@@ -1,8 +1,9 @@
+import type { SetStoreFunction } from 'solid-js/store'
 import { isDef } from '@/utils/is'
 import watch from '@/watch'
-import { createComponent, createContext, createMemo, useContext } from 'solid-js'
 /* eslint-disable ts/no-empty-object-type */
-import { createStore, type SetStoreFunction } from 'solid-js/store'
+import { createComponent, createContext, createMemo, useContext } from 'solid-js'
+import { createStore } from 'solid-js/store'
 
 export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
 
@@ -41,7 +42,7 @@ function addGetter(obj: object, propName: string, getterFunction: () => any) {
   })
 }
 
-export function buildRealState<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {} >(params: {
+export function buildRealState<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {}>(params: {
   state: () => T
   nowrapData?: U
   getters?: G & ThisType<Omit<RealContextThis<T, U, G, M>, 'actions'>>
@@ -105,9 +106,9 @@ export function buildRealState<T extends object, U extends object = {}, M extend
 
 export type MaybeSignals<T extends object> = { [K in keyof T]: T[K] | (() => T[K] | undefined) }
 
-export function buildContext<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {} >(params: {
+export function buildContext<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {}>(params: {
   state: () => T
-  nowrapData?: U
+  nowrapData?: () => U
   getters?: G & ThisType<Omit<RealContextThis<T, U, G, M>, 'actions'>>
   methods?: M & ThisType<RealContextThis<T, U, G, M>>
 }) {
@@ -133,7 +134,7 @@ export function buildContext<T extends object, U extends object = {}, M extends 
 
       const value = buildRealState({
         state: () => ({ ...params.state(), ...resolvedInitialState }) as T,
-        nowrapData: params.nowrapData,
+        nowrapData: params.nowrapData?.(),
         getters: params.getters,
         methods: params.methods,
       })
@@ -156,7 +157,10 @@ export function buildContext<T extends object, U extends object = {}, M extends 
       }
 
       return { Provider(props: any) {
-        return createComponent(context.Provider, { value, get children() { return props.children } })
+        return createComponent(context.Provider, {
+          value,
+          get children() { return props.children },
+        })
       }, value }
     },
     defaultValue: params.state,
