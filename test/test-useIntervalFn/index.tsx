@@ -1,5 +1,5 @@
 import useIntervalFn from '@/useIntervalFn'
-import { createSignal, onCleanup, Show } from 'solid-js'
+import { Show, createSignal, onCleanup } from 'solid-js'
 
 function CorePage() {
   const [count, setCount] = createSignal(0)
@@ -17,14 +17,15 @@ function CorePage() {
         Count:
         {count()}
       </div>
-      <button onClick={() => {
-        if (isActive()) {
-          pause()
-        }
-        else {
-          resume()
-        }
-      }}
+      <button
+        type='button'
+        onClick={() => {
+          if (isActive()) {
+            pause()
+          } else {
+            resume()
+          }
+        }}
       >
         {isActive() ? '停止' : '继续'}
       </button>
@@ -48,7 +49,9 @@ export default function TestUseInterval() {
         <CorePage />
       </Show>
       <div>
-        <button onClick={() => setCorePage(!corePage())}>改变页面</button>
+        <button type='button' onClick={() => setCorePage(!corePage())}>
+          改变页面
+        </button>
       </div>
     </div>
   )

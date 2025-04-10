@@ -1,5 +1,5 @@
 import { useEventListener } from '@/useEventListener'
-import { createSignal, Show } from 'solid-js'
+import { Show, createSignal } from 'solid-js'
 
 function CorePage() {
   useEventListener(document, 'click', () => {
@@ -28,7 +28,9 @@ export default function TestUseEventListener() {
         <CorePage />
       </Show>
       <div>
-        <button onClick={() => setShow(!show())}>改变页面</button>
+        <button type='button' onClick={() => setShow(!show())}>
+          改变页面
+        </button>
       </div>
     </div>
   )

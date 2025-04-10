@@ -10,15 +10,16 @@ export default function TestUseTimeoutFn() {
   return (
     <div>
       <h1>{finished() ? '完成' : 'not yet'}</h1>
-      <button onClick={() => {
-        if (isPending()) {
-          stop()
-        }
-        else {
-          start()
-          setFinished(false)
-        }
-      }}
+      <button
+        type='button'
+        onClick={() => {
+          if (isPending()) {
+            stop()
+          } else {
+            start()
+            setFinished(false)
+          }
+        }}
       >
         {isPending() ? '停止' : '启动'}
       </button>

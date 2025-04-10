@@ -1,6 +1,6 @@
-import type { Fn } from '@/utils/types'
 import useEventListener from '@/useEventListener'
 import { isIOS, noop } from '@/utils/is'
+import type { Fn } from '@/utils/types'
 import { onCleanup } from 'solid-js'
 
 export interface OnClickOutsideOptions {
@@ -33,14 +33,14 @@ export function onClickOutside<T extends OnClickOutsideOptions>(
 ) {
   const { ignore = [], capture = true, detectIframe = false } = options
 
-  if (!window)
-    return
+  if (!window) return
 
   // Fixes: https://github.com/vueuse/vueuse/issues/1520
   // How it works: https://stackoverflow.com/a/39712411
   if (isIOS && !_iOSWorkaround) {
     _iOSWorkaround = true
-    Array.from(window.document.body.children).forEach(el => el.addEventListener('click', noop))
+    // biome-ignore lint/complexity/noForEach: <explanation>
+    Array.from(window.document.body.children).forEach((el) => el.addEventListener('click', noop))
     window.document.documentElement.addEventListener('click', noop)
   }
 
@@ -48,7 +48,7 @@ export function onClickOutside<T extends OnClickOutsideOptions>(
     return ignore.some((target) => {
       if (typeof target === 'string') {
         return Array.from(window.document.querySelectorAll(target)).some(
-          el => el === event.target || event.composedPath().includes(el),
+          (el) => el === event.target || event.composedPath().includes(el),
         )
       }
       const el = target
@@ -61,11 +61,9 @@ export function onClickOutside<T extends OnClickOutsideOptions>(
   const listener = (event: PointerEvent) => {
     const el = target
 
-    if (!el || el === event.target || event.composedPath().includes(el))
-      return
+    if (!el || el === event.target || event.composedPath().includes(el)) return
 
-    if (event.detail === 0)
-      shouldListen = !shouldIgnore(event)
+    if (event.detail === 0) shouldListen = !shouldIgnore(event)
 
     if (!shouldListen) {
       shouldListen = true
@@ -82,26 +80,26 @@ export function onClickOutside<T extends OnClickOutsideOptions>(
       'pointerdown',
       (e) => {
         const el = target
-        if (el)
-          shouldListen = !e.composedPath().includes(el) && !shouldIgnore(e)
+        if (el) shouldListen = !e.composedPath().includes(el) && !shouldIgnore(e)
       },
       { passive: true },
     ),
-    detectIframe
-    && useEventListener(window, 'blur', (event) => {
-      setTimeout(() => {
-        const el = target
-        if (
-          window.document.activeElement?.tagName === 'IFRAME'
-          && !el?.contains(window.document.activeElement)
-        ) {
-          handler(event as any)
-        }
-      }, 0)
-    }),
+    detectIframe &&
+      useEventListener(window, 'blur', (event) => {
+        setTimeout(() => {
+          const el = target
+          if (
+            window.document.activeElement?.tagName === 'IFRAME' &&
+            !el?.contains(window.document.activeElement)
+          ) {
+            handler(event as any)
+          }
+        }, 0)
+      }),
   ].filter(Boolean) as Fn[]
 
-  const stop = () => cleanup.forEach(fn => fn())
+  // biome-ignore lint/complexity/noForEach: <explanation>
+  const stop = () => cleanup.forEach((fn) => fn())
 
   onCleanup(stop)
 

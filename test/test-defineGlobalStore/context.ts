@@ -25,7 +25,6 @@ const context = defineGlobalStore('test', {
   },
 
   persist: 'localStorage',
-
 })
 
 export default context

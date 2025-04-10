@@ -5,12 +5,7 @@
   "private": false,
   "description": "Try make a tiny vueuse port for SolidJS",
   "license": "MIT",
-  "keywords": [
-    "solid",
-    "solidjs",
-    "vueuse",
-    "utils"
-  ],
+  "keywords": ["solid", "solidjs", "vueuse", "utils"],
   "exports": {
     "import": {
       "types": "./dist/index.d.ts",
@@ -21,17 +16,16 @@
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "typesVersions": {},
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
     "start": "vite",
     "dev": "vite",
     "build": "tsup --dts",
     "serve": "vite preview",
     "pub": "pnpm build && pnpm publish",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
+    "lint": "pnpm exec biome check .",
+    "lint:error": "pnpm exec biome check . --diagnostic-level=\"error\"",
+    "lint:fix": "pnpm exec biome check --write .",
     "type-check": "tsc --noEmit --skipLibCheck"
   },
   "peerDependencies": {
@@ -39,12 +33,11 @@
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.8.1",
+    "@biomejs/biome": "1.9.4",
     "@types/node": "^22.9.0",
     "@unocss/reset": "^66.0.0",
     "@unocss/vite": "^66.0.0",
     "esbuild-plugin-solid": "^0.6.0",
-    "eslint": "^9.15.0",
-    "eslint-plugin-solid": "^0.14.4",
     "tsup": "^8.4.0",
     "typescript": "^5.4.5",
     "unocss": "^66.0.0",
@@ -53,8 +46,6 @@
   },
   "browser": {},
   "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
+    "onlyBuiltDependencies": ["@biomejs/biome"]
   }
 }

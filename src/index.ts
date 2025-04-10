@@ -11,4 +11,11 @@ export * from './defineGlobalStore'
 
 export * from './mountStyle'
 
-export { createComponentState, onClickOutside, useEventListener, useIntervalFn, useTimeoutFn, watch }
+export {
+  createComponentState,
+  onClickOutside,
+  useEventListener,
+  useIntervalFn,
+  useTimeoutFn,
+  watch,
+}

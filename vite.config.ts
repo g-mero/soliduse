@@ -12,9 +12,10 @@ export default defineConfig(({ command }) => {
       },
     },
     plugins: [
-      command === 'serve' && UnoCSS({
-        presets: [presetUno()],
-      }),
+      command === 'serve' &&
+        UnoCSS({
+          presets: [presetUno()],
+        }),
       solidPlugin(),
     ],
   }

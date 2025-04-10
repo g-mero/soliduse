@@ -1,17 +1,25 @@
-import type { SetStoreFunction } from 'solid-js/store'
 import { isDef } from '@/utils/is'
 import watch from '@/watch'
 /* eslint-disable ts/no-empty-object-type */
-import { createComponent, createContext, createMemo, useContext } from 'solid-js'
+import { batch, createComponent, createContext, createMemo, useContext } from 'solid-js'
+import type { SetStoreFunction } from 'solid-js/store'
 import { createStore } from 'solid-js/store'
 
-export interface Methods { setState?: undefined, [key: string]: ((...args: any[]) => any) | undefined }
+export interface Methods {
+  setState?: undefined
+  [key: string]: ((...args: any[]) => any) | undefined
+}
 
 type GetterObj<T extends Getters> = { [K in keyof T]: ReturnType<T[K]> }
 
-export type RealState<T, G extends Getters, M> = [Readonly<T & GetterObj<G>>, Omit<Setter<T>, keyof M> & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> }]
+export type RealState<T, G extends Getters, M> = [
+  Readonly<T & GetterObj<G>>,
+  Omit<Setter<T>, keyof M> & Omit<M, 'setState' | keyof G> & { setState: SetStoreFunction<T> },
+]
 
-export interface Getters { [key: string]: ((...args: any[]) => any) }
+export interface Getters {
+  [key: string]: (...args: any[]) => any
+}
 
 export interface RealContextThis<T, U, G extends Getters, M> {
   state: RealState<T, G, M>[0]
@@ -20,7 +28,7 @@ export interface RealContextThis<T, U, G extends Getters, M> {
 }
 
 type Setter<T> = {
-  [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void;
+  [K in keyof T as `set${Capitalize<string & K>}`]: (value: T[K]) => void
 }
 
 // 辅助函数，用于首字母大写
@@ -42,7 +50,12 @@ function addGetter(obj: object, propName: string, getterFunction: () => any) {
   })
 }
 
-export function buildRealState<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {}>(params: {
+export function buildRealState<
+  T extends object,
+  U extends object = {},
+  M extends Methods = {},
+  G extends Getters = {},
+>(params: {
   state: () => T
   nowrapData?: U
   getters?: G & ThisType<Omit<RealContextThis<T, U, G, M>, 'actions'>>
@@ -69,10 +82,13 @@ export function buildRealState<T extends object, U extends object = {}, M extend
   if (getters) {
     for (const key in getters) {
       realGetters[key] = createMemo((...args: any[]) => {
-        return getters[key].apply({
-          state: state2,
-          nowrapData: params.nowrapData,
-        }, args)
+        return getters[key].apply(
+          {
+            state: state2,
+            nowrapData: params.nowrapData,
+          },
+          args,
+        )
       })
     }
   }
@@ -89,12 +105,17 @@ export function buildRealState<T extends object, U extends object = {}, M extend
     for (const key in methods) {
       // @ts-expect-error xxx
       realState[1][key] = (...args: any[]) => {
-        // @ts-expect-error xxx
-        return methods[key].apply({
-          state: state2,
-          actions,
-          nowrapData: params.nowrapData,
-        }, args)
+        return batch(() =>
+          // @ts-expect-error xxx
+          methods[key].apply(
+            {
+              state: state2,
+              actions,
+              nowrapData: params.nowrapData,
+            },
+            args,
+          ),
+        )
       }
     }
   }
@@ -106,7 +127,12 @@ export function buildRealState<T extends object, U extends object = {}, M extend
 
 export type MaybeSignals<T extends object> = { [K in keyof T]: T[K] | (() => T[K] | undefined) }
 
-export function buildContext<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {}>(params: {
+export function buildContext<
+  T extends object,
+  U extends object = {},
+  M extends Methods = {},
+  G extends Getters = {},
+>(params: {
   state: () => T
   nowrapData?: () => U
   getters?: G & ThisType<Omit<RealContextThis<T, U, G, M>, 'actions'>>
@@ -156,12 +182,17 @@ export function buildContext<T extends object, U extends object = {}, M extends 
         }
       }
 
-      return { Provider(props: any) {
-        return createComponent(context.Provider, {
-          value,
-          get children() { return props.children },
-        })
-      }, value }
+      return {
+        Provider(props: any) {
+          return createComponent(context.Provider, {
+            value,
+            get children() {
+              return props.children
+            },
+          })
+        },
+        value,
+      }
     },
     defaultValue: params.state,
   }

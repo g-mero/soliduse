@@ -1,15 +1,20 @@
 /* eslint-disable ts/no-empty-object-type */
 import type { Getters, Methods, RealContextThis } from '@/createComponentState/buildContext'
-import type { Fn } from '@/utils/types'
 import { buildRealState } from '@/createComponentState/buildContext'
 import useEventListener from '@/useEventListener'
 import { getBrowserApi } from '@/utils/getBrowserApi'
+import type { Fn } from '@/utils/types'
 import watch from '@/watch'
 import { createRoot } from 'solid-js'
 
 const shouldRun: Fn[] = []
 
-function defineGlobalStore<T extends object, U extends object = {}, M extends Methods = {}, G extends Getters = {}>(
+function defineGlobalStore<
+  T extends object,
+  U extends object = {},
+  M extends Methods = {},
+  G extends Getters = {},
+>(
   name: string,
   params: {
     state: () => T
@@ -38,8 +43,7 @@ function defineGlobalStore<T extends object, U extends object = {}, M extends Me
 
         shouldRun.push(() => {
           const key = name
-          if (!key)
-            return
+          if (!key) return
 
           const stored = storage.getItem(key)
           if (stored) {
@@ -51,8 +55,7 @@ function defineGlobalStore<T extends object, U extends object = {}, M extends Me
                   actions.setState(key as any, storedState[key])
                 }
               }
-            }
-            catch {
+            } catch {
               storage.setItem(key, JSON.stringify(s))
             }
           }
@@ -72,11 +75,11 @@ function defineGlobalStore<T extends object, U extends object = {}, M extends Me
                   }
                 }
 
+                // biome-ignore lint/complexity/noForEach: <explanation>
                 shouldSetKeys.forEach((key) => {
                   actions.setState(key as any, storedState[key])
                 })
-              }
-              catch {
+              } catch {
                 storage.setItem(key, JSON.stringify(s))
               }
             }
@@ -91,7 +94,8 @@ function defineGlobalStore<T extends object, U extends object = {}, M extends Me
 
 function enableGlobalStore() {
   createRoot(() => {
-    shouldRun.forEach(fn => fn())
+    // biome-ignore lint/complexity/noForEach: <explanation>
+    shouldRun.forEach((fn) => fn())
   })
 }
 

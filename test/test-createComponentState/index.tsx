@@ -2,15 +2,18 @@ import watch from '@/watch'
 import ComponentState from './state'
 
 function CheckValue() {
-  const [state,,untrackData] = ComponentState.useContext()
+  const [state, , untrackData] = ComponentState.useContext()
 
   watch([() => state.doubleCount], ([doubleCount]) => {
     console.log('doubleCount:', doubleCount)
   })
 
-  watch(() => untrackData.untrack, (u) => {
-    console.log(u)
-  })
+  watch(
+    () => untrackData.untrack,
+    (u) => {
+      console.log(u)
+    },
+  )
 
   return <></>
 }
@@ -29,18 +32,18 @@ function TestProps(props: {
   return (
     <TestState.Provider>
       <CheckValue />
-      <input type="range" value={state.count} onChange={e => actions.setState('count', Number(e.target.value))} />
+      <input
+        type='range'
+        value={state.count}
+        onChange={(e) => actions.setState('count', Number(e.target.value))}
+      />
       <h1>
-        {state.count}
-        {' '}
-        {state.test}
+        {state.count} {state.test}
       </h1>
     </TestState.Provider>
   )
 }
 
 export default function TestCreateComponentState() {
-  return (
-    <TestProps count={24} />
-  )
+  return <TestProps count={24} />
 }

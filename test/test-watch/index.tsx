@@ -6,20 +6,20 @@ export function TestWatch() {
   const [b, setB] = createSignal('0')
   const [c, setC] = createSignal(0)
 
-  watch(a, (input, prevInput) => {
+  watch(a, (_input, prevInput) => {
     console.log(prevInput)
   })
   return (
     <div>
-      <button onClick={() => setA(a() + 1)}>
+      <button type='button' onClick={() => setA(a() + 1)}>
         Increment A:
         {a()}
       </button>
-      <button onClick={() => setB(b() + 1)}>
+      <button type='button' onClick={() => setB(b() + 1)}>
         Increment B:
         {b()}
       </button>
-      <button onClick={() => setC(c() + 1)}>
+      <button type='button' onClick={() => setC(c() + 1)}>
         Increment C:
         {c()}
       </button>

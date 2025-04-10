@@ -6,8 +6,7 @@ export default function useTimeoutFn(cb: () => void, timeout = 500): Stoppable {
   let timer: number
 
   const start = () => {
-    if (isPending())
-      return
+    if (isPending()) return
     setIsPending(true)
     timer = setTimeout(() => {
       cb()

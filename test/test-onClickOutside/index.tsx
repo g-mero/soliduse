@@ -1,5 +1,5 @@
 import { onClickOutside } from '@/onClickOutside'
-import { createSignal, onCleanup, onMount, Show } from 'solid-js'
+import { Show, createSignal, onCleanup, onMount } from 'solid-js'
 
 function CanClose(props: {
   setOpen: (open: boolean) => void
@@ -21,15 +21,9 @@ function CanClose(props: {
   })
 
   return (
-
     <div ref={ref}>
-
-      <div class="p-4 bg-gray-200">
-        Click outside to close
-      </div>
-
+      <div class='p-4 bg-gray-200'>Click outside to close</div>
     </div>
-
   )
 }
 
@@ -44,15 +38,19 @@ export default function TestOnClickOutside() {
   const [open, setOpen] = createSignal(true)
 
   onMount(() => {
-    onClickOutside(ref, () => {
-      setCount(count() + 1)
-    }, {
-      ignore: [ref1, ref2],
-    })
+    onClickOutside(
+      ref,
+      () => {
+        setCount(count() + 1)
+      },
+      {
+        ignore: [ref1, ref2],
+      },
+    )
   })
 
   return (
-    <div class="p-4 bg-gray-200">
+    <div class='p-4 bg-gray-200'>
       <div>Click outside to increment count</div>
       <div ref={ref}>
         Count:
